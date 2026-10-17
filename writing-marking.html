@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debate Writing & Marking</title>
+  <style>
+    :root {
+      --sky-top: #7dd3fc;
+      --sky-mid: #a78bfa;
+      --sky-bottom: #f9a8d4;
+      --card: #fffef8;
+      --ink: #2d1b4e;
+      --accent: #ff6b9d;
+      --correct: #22c55e;
+      --warn: #f59e0b;
+      --wrong: #ef4444;
+      --shadow: rgba(45, 27, 78, 0.2);
+      --purple: #8b5cf6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      font-family: "Segoe UI", "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 20%, #fde68a 0%, transparent 35%),
+        radial-gradient(circle at 85% 15%, #fda4af 0%, transparent 30%),
+        radial-gradient(circle at 70% 80%, #86efac 0%, transparent 35%),
+        linear-gradient(165deg, var(--sky-top), var(--sky-mid) 45%, var(--sky-bottom));
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    header { text-align: center; margin-bottom: 1rem; }
+
+    h1 {
+      font-size: clamp(1.6rem, 5vw, 2.25rem);
+      text-shadow: 3px 3px 0 #fff, 5px 5px 0 rgba(255, 107, 157, 0.35);
+      animation: bounce-title 2.4s ease-in-out infinite;
+    }
+
+    @keyframes bounce-title {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .progress {
+      display: inline-flex;
+      gap: 0.45rem;
+      margin-top: 0.65rem;
+      padding: 0.35rem 0.85rem;
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 999px;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 0 var(--shadow);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 4px solid #fff;
+      border-radius: 1.5rem;
+      padding: 1.25rem 1.35rem;
+      box-shadow: 0 8px 0 var(--shadow);
+      animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-bottom: 1rem;
+    }
+
+    @keyframes pop-in {
+      from { opacity: 0; transform: scale(0.94) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .q-label {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.65rem;
+      box-shadow: 0 3px 0 #c9184a;
+    }
+
+    .question-text {
+      font-size: clamp(1.05rem, 3.2vw, 1.3rem);
+      font-weight: 800;
+      line-height: 1.4;
+      margin-bottom: 0.85rem;
+    }
+
+    .rubric-preview {
+      background: rgba(167, 139, 250, 0.15);
+      border: 2px dashed rgba(139, 92, 246, 0.45);
+      border-radius: 1rem;
+      padding: 0.75rem 0.9rem;
+      font-size: 0.88rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .rubric-preview strong { display: block; margin-bottom: 0.35rem; }
+
+    .rubric-preview ul {
+      margin-left: 1.1rem;
+      line-height: 1.45;
+    }
+
+    label.answer-label {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      resize: vertical;
+      border: 4px solid #fff;
+      border-radius: 1.15rem;
+      padding: 0.9rem 1rem;
+      font: inherit;
+      font-size: 1rem;
+      line-height: 1.5;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: inset 0 2px 8px rgba(45, 27, 78, 0.08), 0 4px 0 var(--shadow);
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #c4b5fd;
+      box-shadow: inset 0 2px 8px rgba(45, 27, 78, 0.08), 0 0 0 3px rgba(139, 92, 246, 0.25), 0 4px 0 var(--shadow);
+    }
+
+    .hint {
+      font-size: 0.82rem;
+      opacity: 0.75;
+      margin-top: 0.4rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      appearance: none;
+      border: 4px solid #fff;
+      border-radius: 999px;
+      padding: 0.7rem 1.5rem;
+      font: inherit;
+      font-weight: 800;
+      font-size: 1.02rem;
+      cursor: pointer;
+      color: white;
+      background: var(--accent);
+      box-shadow: 0 5px 0 #c9184a;
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #c9184a;
+    }
+
+    .btn.secondary {
+      background: var(--purple);
+      box-shadow: 0 5px 0 #5b21b6;
+    }
+    .btn.secondary:active { box-shadow: 0 2px 0 #5b21b6; }
+
+    .btn.ghost {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 5px 0 var(--shadow);
+    }
+    .btn.ghost:active { box-shadow: 0 2px 0 var(--shadow); }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Feedback after submit */
+    .mark-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.85rem 0.9rem;
+      border-radius: 1rem;
+      border: 3px solid #fff;
+      background: rgba(255, 255, 255, 0.75);
+      margin-bottom: 0.65rem;
+      box-shadow: 0 3px 0 var(--shadow);
+    }
+
+    .mark-row.full { border-left: 6px solid var(--correct); }
+    .mark-row.partial { border-left: 6px solid var(--warn); }
+    .mark-row.zero { border-left: 6px solid var(--wrong); }
+
+    .mark-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .mark-controls input {
+      width: 3rem;
+      text-align: center;
+      font: inherit;
+      font-weight: 800;
+      border: 3px solid #fff;
+      border-radius: 0.6rem;
+      padding: 0.25rem;
+      background: #fff;
+      box-shadow: 0 2px 0 var(--shadow);
+    }
+
+    .mark-controls .max {
+      font-weight: 800;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .mark-body { flex: 1; min-width: 180px; }
+
+    .mark-body h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .mark-body p {
+      font-size: 0.88rem;
+      line-height: 1.4;
+      opacity: 0.92;
+    }
+
+    .teacher-note {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--purple);
+      margin-top: 0.35rem;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    @media (max-width: 640px) {
+      .compare { grid-template-columns: 1fr; }
+    }
+
+    .compare-box {
+      background: rgba(255, 255, 255, 0.8);
+      border: 3px solid #fff;
+      border-radius: 1rem;
+      padding: 0.85rem 0.95rem;
+      box-shadow: 0 3px 0 var(--shadow);
+    }
+
+    .compare-box h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.45rem;
+      color: var(--purple);
+    }
+
+    .compare-box.model h4 { color: #166534; }
+
+    .compare-box p {
+      font-size: 0.9rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .q-score {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin: 0.75rem 0 0.25rem;
+    }
+
+    /* Final results */
+    .score-banner {
+      text-align: center;
+      padding: 1.5rem 1.25rem;
+    }
+
+    .score-banner .big {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 900;
+      margin: 0.35rem 0;
+    }
+
+    .overall-feedback {
+      background: rgba(255, 255, 255, 0.85);
+      border: 3px solid #fff;
+      border-radius: 1.15rem;
+      padding: 1rem 1.1rem;
+      margin: 1rem 0;
+      line-height: 1.5;
+      font-size: 0.98rem;
+      box-shadow: 0 4px 0 var(--shadow);
+    }
+
+    .summary-list { margin: 1rem 0; }
+
+    .summary-item {
+      background: rgba(255, 255, 255, 0.8);
+      border: 3px solid #fff;
+      border-radius: 1rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.65rem;
+      box-shadow: 0 3px 0 var(--shadow);
+    }
+
+    .summary-item h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    #fireworks {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .celebrate-msg {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <header>
+      <h1>Debate Writing!</h1>
+      <div class="progress" id="progress">Question 1 of 3 · 0 / 30 so far</div>
+    </header>
+
+    <section id="write-view">
+      <div class="card" id="question-card">
+        <span class="q-label" id="q-label">Question 1</span>
+        <p class="question-text" id="question-text"></p>
+        <div class="rubric-preview" id="rubric-preview"></div>
+        <label class="answer-label" for="answer">Your answer</label>
+        <textarea id="answer" placeholder="Type your full answer here…" autocomplete="off" spellcheck="true"></textarea>
+        <p class="hint">Tip: take a clear side, explain with “because”, and add a real example.</p>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="submit-btn">Submit answer</button>
+      </div>
+    </section>
+
+    <section id="feedback-view" class="hidden">
+      <div class="card">
+        <span class="q-label">Marking</span>
+        <p class="question-text" id="fb-question" style="font-size:1.05rem"></p>
+        <div id="marks-list"></div>
+        <p class="q-score" id="q-score"></p>
+        <p class="teacher-note" style="text-align:center">Teachers can change any mark above if the auto-check missed something.</p>
+        <div class="compare">
+          <div class="compare-box">
+            <h4>Your answer</h4>
+            <p id="student-answer"></p>
+          </div>
+          <div class="compare-box model">
+            <h4>Model answer (full marks)</h4>
+            <p id="model-answer"></p>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn secondary" id="next-btn">Next →</button>
+      </div>
+    </section>
+
+    <section id="results-view" class="hidden">
+      <div class="card score-banner">
+        <p class="celebrate-msg" id="celebrate-msg"></p>
+        <p class="big" id="final-score"></p>
+        <div class="overall-feedback" id="overall-feedback"></div>
+      </div>
+      <div class="summary-list" id="summary-list"></div>
+      <div class="actions">
+        <button type="button" class="btn secondary" id="try-again">Try Again</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      {
+        id: 1,
+        question:
+          "Should schools ban mobile phones during class? Pick ONE side and write a short argument. Include your stance, two reasons, and one example.",
+        max: 10,
+        modelAnswer:
+          "I think schools should ban mobile phones during class. First, phones distract students because notifications and chats pull attention away from the lesson, so learning suffers. Second, a ban helps everyone stay fair and focused, since no one is secretly texting while others try to concentrate. For example, when my class put phones in a pouch at the start of science, we finished experiments faster and asked more questions. That shows a clear phone-free rule can improve learning without being harsh.",
+        criteria: [
+          {
+            id: "stance",
+            label: "Clear stance stated",
+            max: 2,
+            check(text, ctx) {
+              const t = text.toLowerCase();
+              const hasStance =
+                /\bi (think|believe|feel|argue|agree|disagree)\b/.test(t) ||
+                /\b(should|should not|shouldn't|must|ought to)\b/.test(t) ||
+                /\b(in my (opinion|view)|my stance|i support|i oppose)\b/.test(t) ||
+                /\b(ban|banned|not ban|allow|allowed)\b/.test(t);
+              const picksSide =
+                /\b(should|must)\b.*\b(ban|not allow|prohibit)\b/.test(t) ||
+                /\b(should not|shouldn't|must not)\b.*\b(ban)\b/.test(t) ||
+                /\b(against|in favour of|in favor of|support|oppose)\b/.test(t) ||
+                /\bphones?\b.*\b(should|shouldn't|should not)\b/.test(t) ||
+                /\b(should|shouldn't|should not)\b.*\bphones?\b/.test(t);
+              if (hasStance && picksSide) {
+                return {
+                  marks: 2,
+                  note: "Nice clear stance — you took a side and stated it openly. That helps the reader know exactly where you stand."
+                };
+              }
+              if (hasStance || picksSide) {
+                return {
+                  marks: 1,
+                  note: "There’s a hint of a side, but make the stance sharper (e.g. “I think schools should ban phones…”)."
+                };
+              }
+              return {
+                marks: 0,
+                note: "A clear stance wasn’t found (words like “I think”, “should”, or “should not”). Start by picking one side."
+              };
+            }
+          },
+          {
+            id: "reason1",
+            label: "First reason, explained",
+            max: 2,
+            check(text) {
+              return scoreExplainedReason(text, 1);
+            }
+          },
+          {
+            id: "reason2",
+            label: "Second reason, explained",
+            max: 2,
+            check(text) {
+              return scoreExplainedReason(text, 2);
+            }
+          },
+          {
+            id: "example",
+            label: "A real example that supports the reasons",
+            max: 2,
+            check(text) {
+              return scoreExample(text);
+            }
+          },
+          {
+            id: "organize",
+            label: "Clear and organized writing",
+            max: 2,
+            check(text) {
+              return scoreOrganization(text);
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        question:
+          'Your opponent says: "Homework should be banned because students are already tired after school." Write a rebuttal that challenges this argument.',
+        max: 10,
+        modelAnswer:
+          "My opponent claims that homework should be banned because students are already tired after school. However, this argument is weak because feeling tired does not mean homework has no value, and it overlooks that tiredness can be managed with shorter, smarter tasks. A better approach is to keep some homework, since regular practice helps students remember lessons — for example, short maths review at home often improves test scores. We can stay kind to tired students with lighter workloads, without throwing homework away completely.",
+        criteria: [
+          {
+            id: "restate",
+            label: "Correctly states the opponent's main claim",
+            max: 2,
+            check(text) {
+              const t = text.toLowerCase();
+              const mentionsOpp =
+                /\b(opponent|they|their argument|the claim|you said|you claim|argues?|says?|said)\b/.test(t) ||
+                /\b(claim|argument|point)\b/.test(t);
+              const mentionsHomework = /\bhomework\b/.test(t);
+              const mentionsTired =
+                /\b(tired|exhaust|fatigue|after school|worn out)\b/.test(t);
+              const mentionsBan =
+                /\b(ban|banned|should be banned|get rid of|remove)\b/.test(t);
+              const restated = mentionsHomework && (mentionsTired || mentionsBan);
+              if (restated && mentionsOpp) {
+                return {
+                  marks: 2,
+                  note: "Great — you restated the opponent’s claim clearly before challenging it. That shows fair debating."
+                };
+              }
+              if (restated) {
+                return {
+                  marks: 1,
+                  note: "You touched the homework/tired idea, but name it as their claim more clearly (e.g. “My opponent says…”)."
+                };
+              }
+              return {
+                marks: 0,
+                note: "The opponent’s main claim wasn’t clearly restated. Briefly repeat their point about homework and tiredness first."
+              };
+            }
+          },
+          {
+            id: "weakness",
+            label: "Points out a weakness or flaw in it",
+            max: 3,
+            check(text) {
+              const t = text.toLowerCase();
+              const challengeWords =
+                /\b(however|but|although|yet|still|weak|flaw|problem|issue|overlooks?|ignores?|not always|doesn't mean|does not mean|false|incorrect|mistaken|incomplete|assumes?)\b/.test(t);
+              const explainsWhy =
+                /\b(because|since|as|if|even if|that doesn't|that does not)\b/.test(t) &&
+                t.split(/\s+/).length >= 40;
+              if (challengeWords && explainsWhy) {
+                return {
+                  marks: 3,
+                  note: "Strong challenge — you spotted a weakness and explained why the tiredness claim doesn’t fully work."
+                };
+              }
+              if (challengeWords) {
+                return {
+                  marks: 2,
+                  note: "You signal a challenge (e.g. “however / but / weak”), but add a clearer explanation of the flaw."
+                };
+              }
+              if (/\b(disagree|challenge|rebut|against)\b/.test(t)) {
+                return {
+                  marks: 1,
+                  note: "There’s a start of pushback, but name the weakness more directly and explain it."
+                };
+              }
+              return {
+                marks: 0,
+                note: "A clear weakness wasn’t found. Try “However, this is weak because…” and explain the flaw."
+              };
+            }
+          },
+          {
+            id: "counter",
+            label: "Gives a counter-reason or evidence",
+            max: 3,
+            check(text) {
+              const t = text.toLowerCase();
+              const hasReason =
+                /\b(because|since|as|therefore|so)\b/.test(t);
+              const hasEvidence =
+                /\b(for example|for instance|such as|evidence|research|study|shows?|prove|often|can help)\b/.test(t) ||
+                /\b(practice|improve|remember|learn|skills?)\b/.test(t);
+              const constructive =
+                /\b(instead|better|keep|shorter|manage|balance|still need|important|helpful|value)\b/.test(t);
+              let marks = 0;
+              if (hasReason) marks += 1;
+              if (hasEvidence) marks += 1;
+              if (constructive && (hasReason || hasEvidence)) marks += 1;
+              marks = Math.min(3, marks);
+              if (marks === 3) {
+                return {
+                  marks,
+                  note: "Excellent counter — you offered a reason/evidence and a constructive alternative. Well done!"
+                };
+              }
+              if (marks === 2) {
+                return {
+                  marks,
+                  note: "Good counter ideas are forming. Add a clearer reason with “because” plus a quick example or evidence."
+                };
+              }
+              if (marks === 1) {
+                return {
+                  marks,
+                  note: "There’s a hint of a counter-point. Strengthen it with “because…” and maybe a short example."
+                };
+              }
+              return {
+                marks: 0,
+                note: "A counter-reason or evidence wasn’t clear. Add why homework still helps, with “because” or an example."
+              };
+            }
+          },
+          {
+            id: "tone",
+            label: "Stays polite and confident in tone",
+            max: 2,
+            check(text) {
+              return scoreTone(text);
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        question:
+          'Motion: "This house believes success is more about luck than hard work." Define what "success" means for this debate, then give one argument for the hard work side.',
+        max: 10,
+        modelAnswer:
+          "For this debate, success means achieving meaningful personal goals — such as finishing school well, building useful skills, or reaching a career you worked toward — not only sudden fame or money. I argue for the hard work side: hard work matters more because consistent effort builds skills that luck alone cannot give you. For example, athletes who train every day improve their performance even when lucky breaks are rare, which shows that practice creates results you can repeat. So once success is defined as lasting achievement, hard work becomes the stronger path.",
+        criteria: [
+          {
+            id: "definition",
+            label: 'Clear definition of "success"',
+            max: 3,
+            check(text) {
+              const t = text.toLowerCase();
+              const defines =
+                /\bsuccess\b.{0,40}\b(means|is|refers to|can be defined|defined as|in this debate)\b/.test(t) ||
+                /\b(means|refers to|defined as|definition of)\b.{0,40}\bsuccess\b/.test(t) ||
+                /\bfor this debate\b.{0,60}\bsuccess\b/.test(t);
+              const substance =
+                /\b(goal|achieve|achievement|career|skill|education|happy|fulfilment|progress|result)\b/.test(t);
+              if (defines && substance) {
+                return {
+                  marks: 3,
+                  note: "Clear definition — you explained what “success” means in this debate, which sets up your argument well."
+                };
+              }
+              if (defines || (/\bsuccess\b/.test(t) && substance && /\b(means|is|refers)\b/.test(t))) {
+                return {
+                  marks: 2,
+                  note: "You started defining success. Make it sharper: “Success means…” and say what counts in this debate."
+                };
+              }
+              if (/\bsuccess\b/.test(t)) {
+                return {
+                  marks: 1,
+                  note: "Success is mentioned, but a clear definition (“means / refers to / defined as”) is still needed."
+                };
+              }
+              return {
+                marks: 0,
+                note: "A definition of success wasn’t found. Begin with “For this debate, success means…”"
+              };
+            }
+          },
+          {
+            id: "hardwork",
+            label: "One strong argument for hard work",
+            max: 3,
+            check(text) {
+              const t = text.toLowerCase();
+              const hardWorkSide =
+                /\b(hard work|hardwork|effort|practice|training|discipline|perseverance|persist)\b/.test(t);
+              const argues =
+                /\b(because|since|matters? more|more important|stronger|argue|believe|should)\b/.test(t);
+              const againstLuckOnly =
+                /\b(luck alone|not only luck|more than luck|rather than luck|instead of luck|cannot rely on luck)\b/.test(t) ||
+                (/\bluck\b/.test(t) && /\b(alone|only|enough|without)\b/.test(t));
+              let marks = 0;
+              if (hardWorkSide) marks += 1;
+              if (hardWorkSide && argues) marks += 1;
+              if (hardWorkSide && argues && (againstLuckOnly || text.split(/\s+/).length >= 55)) marks += 1;
+              if (marks === 3) {
+                return {
+                  marks,
+                  note: "Strong hard-work argument — you explain why effort matters (and how it beats relying on luck alone)."
+                };
+              }
+              if (marks === 2) {
+                return {
+                  marks,
+                  note: "Good hard-work point. Push it further with “because…” and why luck alone isn’t enough."
+                };
+              }
+              if (marks === 1) {
+                return {
+                  marks,
+                  note: "Hard work is mentioned. Turn it into a full argument with a clear reason."
+                };
+              }
+              return {
+                marks: 0,
+                note: "An argument for hard work wasn’t clear. State why effort matters more than luck, with “because”."
+              };
+            }
+          },
+          {
+            id: "evidence",
+            label: "A supporting example or evidence",
+            max: 2,
+            check(text) {
+              return scoreExample(text);
+            }
+          },
+          {
+            id: "flow",
+            label: "Logical flow from definition to argument",
+            max: 2,
+            check(text) {
+              const t = text.toLowerCase();
+              const words = text.trim().split(/\s+/).filter(Boolean);
+              const defPos = (() => {
+                const m = t.search(/\b(means|refers to|defined as|definition|for this debate)\b/);
+                return m;
+              })();
+              const argPos = (() => {
+                const m = t.search(/\b(hard work|effort|practice|argue|because)\b/);
+                return m;
+              })();
+              const connectors =
+                /\b(so|therefore|thus|then|once|with this definition|from this|that means|this shows)\b/.test(t);
+              const ordered = defPos !== -1 && argPos !== -1 && defPos < argPos;
+              if (ordered && (connectors || words.length >= 70)) {
+                return {
+                  marks: 2,
+                  note: "Smooth flow — definition comes first, then the hard-work argument follows logically. Clear structure!"
+                };
+              }
+              if (ordered || (connectors && words.length >= 50)) {
+                return {
+                  marks: 1,
+                  note: "Structure is partly there. Lead with the definition, then link into the hard-work argument with “so / therefore”."
+                };
+              }
+              return {
+                marks: 0,
+                note: "The path from definition → argument wasn’t clear. Define success first, then argue for hard work."
+              };
+            }
+          }
+        ]
+      }
+    ];
+
+    function scoreExplainedReason(text, which) {
+      const t = text.toLowerCase();
+      const words = text.trim().split(/\s+/).filter(Boolean);
+      const reasonMarkers = [
+        ...t.matchAll(
+          /\b(first|second|secondly|also|another reason|furthermore|moreover|next|one reason|firstly|second reason)\b/g
+        )
+      ];
+      const becauseHits = [...t.matchAll(/\b(because|since|as a result|therefore|so that)\b/g)];
+      const reasonCount = Math.max(reasonMarkers.length, becauseHits.length > 1 ? becauseHits.length : becauseHits.length);
+
+      if (which === 1) {
+        if ((becauseHits.length >= 1 || reasonMarkers.length >= 1) && words.length >= 35) {
+          const explained =
+            becauseHits.length >= 1 ||
+            /\b(this means|leads to|helps|makes|so students|so learning)\b/.test(t);
+          if (explained) {
+            return {
+              marks: 2,
+              note: "First reason is clear and explained — you didn’t just name an idea, you showed why it matters."
+            };
+          }
+          return {
+            marks: 1,
+            note: "A first reason appears, but explain it more with “because / since” and what follows from it."
+          };
+        }
+        if (words.length >= 25 && /\b(distract|focus|learn|fair|cheat|cyber|social media|notification)\b/.test(t)) {
+          return {
+            marks: 1,
+            note: "There’s a reason-like idea. Make it explicit: “First, … because …”"
+          };
+        }
+        return {
+          marks: 0,
+          note: "A clear first reason wasn’t found. Add one point and explain it with “because”."
+        };
+      }
+
+      // second reason
+      const hasSecondMarker =
+        /\b(second|secondly|also|another|furthermore|moreover|next|plus)\b/.test(t);
+      const enoughBecause = becauseHits.length >= 2 || (becauseHits.length >= 1 && hasSecondMarker);
+      if (enoughBecause && words.length >= 55) {
+        return {
+          marks: 2,
+          note: "Second reason is there and explained — two solid points make your argument much stronger."
+        };
+      }
+      if (hasSecondMarker || becauseHits.length >= 2) {
+        return {
+          marks: 1,
+          note: "A second point is starting. Explain it fully with “because” so both reasons feel complete."
+        };
+      }
+      return {
+        marks: 0,
+        note: "A clear second reason wasn’t found. Add another point (“Also, … because …”)."
+      };
+    }
+
+    function scoreExample(text) {
+      const t = text.toLowerCase();
+      const cue =
+        /\b(for example|for instance|such as|like when|in my class|in my school|one time|e\.g\.|eg\.)\b/.test(t);
+      const specific =
+        /\b(when|class|school|student|teacher|test|exam|phone|maths|math|science|athlete|team|study|research|survey)\b/.test(t) &&
+        text.trim().split(/\s+/).length >= 40;
+      if (cue && specific) {
+        return {
+          marks: 2,
+          note: "Helpful example — a concrete case makes your reasons feel real and convincing."
+        };
+      }
+      if (cue || (specific && /\b(when|once|in my)\b/.test(t))) {
+        return {
+          marks: 1,
+          note: "There’s a hint of an example. Make it more concrete with “For example, …” and a real situation."
+        };
+      }
+      return {
+        marks: 0,
+        note: "A supporting example wasn’t found. Add “For example, …” with a real school/life case."
+      };
+    }
+
+    function scoreOrganization(text) {
+      const words = text.trim().split(/\s+/).filter(Boolean);
+      const t = text.toLowerCase();
+      const hasOrder =
+        /\b(first|second|also|finally|in conclusion|overall)\b/.test(t) ||
+        (text.includes(".") && text.split(".").filter((s) => s.trim().length > 15).length >= 2);
+      const lengthOk = words.length >= 60;
+      const lengthPartial = words.length >= 35;
+      if (lengthOk && hasOrder) {
+        return {
+          marks: 2,
+          note: "Clear and organized — good length and a readable order. Easy for a judge to follow!"
+        };
+      }
+      if (lengthPartial || hasOrder) {
+        return {
+          marks: 1,
+          note: "Organization is partly there. Aim for a bit more length and a simple order: stance → reasons → example."
+        };
+      }
+      return {
+        marks: 0,
+        note: "Writing felt too short or jumbled. Use short sentences in order: stance, reason 1, reason 2, example."
+      };
+    }
+
+    function scoreTone(text) {
+      const t = text.toLowerCase();
+      const rude =
+        /\b(stupid|idiot|dumb|shut up|loser|hate you|trash|garbage argument|nonsense you)\b/.test(t);
+      const confident =
+        /\b(however|clearly|important|should|can|we can|i argue|this shows|stronger)\b/.test(t);
+      const polite =
+        /\b(opponent|respectfully|although|however|we|students|better approach|kind)\b/.test(t) ||
+        !rude;
+      if (rude) {
+        return {
+          marks: 0,
+          note: "Tone felt harsh. Keep confidence, but stay polite — challenge the idea, not the person."
+        };
+      }
+      if (confident && polite && text.trim().split(/\s+/).length >= 40) {
+        return {
+          marks: 2,
+          note: "Polite and confident tone — you challenged the idea firmly without being unkind. Perfect debate manners."
+        };
+      }
+      if (polite) {
+        return {
+          marks: 1,
+          note: "Tone is mostly polite. Add a bit more confident language (“However…”, “This shows…”) while staying kind."
+        };
+      }
+      return {
+        marks: 0,
+        note: "Tone was hard to judge as polite and confident. Avoid insults and use calm, firm phrasing."
+      };
+    }
+
+    // ——— App state ———
+    let current = 0;
+    let runningTotal = 0;
+    const results = []; // per question: { marks: [...], answer, adjustedTotal }
+
+    const progressEl = document.getElementById("progress");
+    const writeView = document.getElementById("write-view");
+    const feedbackView = document.getElementById("feedback-view");
+    const resultsView = document.getElementById("results-view");
+    const answerEl = document.getElementById("answer");
+    const submitBtn = document.getElementById("submit-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const tryAgainBtn = document.getElementById("try-again");
+
+    function showQuestion() {
+      const q = QUESTIONS[current];
+      writeView.classList.remove("hidden");
+      feedbackView.classList.add("hidden");
+      resultsView.classList.add("hidden");
+
+      document.getElementById("q-label").textContent = `Question ${current + 1}`;
+      document.getElementById("question-text").textContent = q.question;
+      document.getElementById("rubric-preview").innerHTML =
+        `<strong>Rubric (${q.max} marks)</strong><ul>` +
+        q.criteria.map((c) => `<li>${escapeHtml(c.label)} (${c.max})</li>`).join("") +
+        `</ul>`;
+      answerEl.value = "";
+      updateProgress();
+      answerEl.focus();
+    }
+
+    function updateProgress() {
+      progressEl.textContent = `Question ${Math.min(current + 1, QUESTIONS.length)} of ${QUESTIONS.length} · ${runningTotal} / 30 so far`;
+    }
+
+    function markAnswer(q, text) {
+      return q.criteria.map((c) => {
+        const result = c.check(text.trim(), {});
+        const marks = clamp(result.marks, 0, c.max);
+        return {
+          id: c.id,
+          label: c.label,
+          max: c.max,
+          marks,
+          autoMarks: marks,
+          note: result.note
+        };
+      });
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function sumMarks(markRows) {
+      return markRows.reduce((s, m) => s + Number(m.marks), 0);
+    }
+
+    function renderFeedback(q, text, markRows) {
+      writeView.classList.add("hidden");
+      feedbackView.classList.remove("hidden");
+
+      document.getElementById("fb-question").textContent = q.question;
+      document.getElementById("student-answer").textContent = text.trim() || "(No answer written)";
+      document.getElementById("model-answer").textContent = q.modelAnswer;
+
+      const list = document.getElementById("marks-list");
+      list.innerHTML = "";
+
+      markRows.forEach((m, idx) => {
+        const row = document.createElement("div");
+        const ratio = m.marks / m.max;
+        row.className =
+          "mark-row " + (ratio >= 1 ? "full" : ratio > 0 ? "partial" : "zero");
+        row.innerHTML = `
+          <div class="mark-controls">
+            <input type="number" min="0" max="${m.max}" step="1" value="${m.marks}" data-idx="${idx}" aria-label="Marks for ${escapeHtml(m.label)}" />
+            <span class="max">/ ${m.max}</span>
+          </div>
+          <div class="mark-body">
+            <h4>${escapeHtml(m.label)}</h4>
+            <p>${escapeHtml(m.note)}</p>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+
+      list.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("change", () => {
+          const i = Number(input.dataset.idx);
+          let v = Number(input.value);
+          if (Number.isNaN(v)) v = markRows[i].autoMarks;
+          v = clamp(Math.round(v), 0, markRows[i].max);
+          input.value = String(v);
+          markRows[i].marks = v;
+          if (v !== markRows[i].autoMarks) {
+            // keep note, but signal teacher edit in score line
+          }
+          refreshQuestionScore(q, markRows);
+          const ratio = v / markRows[i].max;
+          input.closest(".mark-row").className =
+            "mark-row " + (ratio >= 1 ? "full" : ratio > 0 ? "partial" : "zero");
+        });
+      });
+
+      refreshQuestionScore(q, markRows);
+      nextBtn.textContent = current === QUESTIONS.length - 1 ? "See final results →" : "Next question →";
+    }
+
+    function refreshQuestionScore(q, markRows) {
+      const total = sumMarks(markRows);
+      document.getElementById("q-score").textContent = `Score for this question: ${total} / ${q.max}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    submitBtn.addEventListener("click", () => {
+      const text = answerEl.value;
+      if (!text.trim()) {
+        answerEl.focus();
+        answerEl.style.borderColor = "#ef4444";
+        setTimeout(() => { answerEl.style.borderColor = ""; }, 800);
+        return;
+      }
+      const q = QUESTIONS[current];
+      const markRows = markAnswer(q, text);
+      results[current] = { markRows, answer: text.trim(), questionId: q.id };
+      renderFeedback(q, text, markRows);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    nextBtn.addEventListener("click", () => {
+      const q = QUESTIONS[current];
+      const stored = results[current];
+      const total = sumMarks(stored.markRows);
+      stored.total = total;
+
+      // recompute running total from all completed
+      runningTotal = results.reduce((s, r) => s + (r && r.total != null ? r.total : 0), 0);
+
+      if (current < QUESTIONS.length - 1) {
+        current += 1;
+        showQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        showFinalResults();
+      }
+    });
+
+    function showFinalResults() {
+      writeView.classList.add("hidden");
+      feedbackView.classList.add("hidden");
+      resultsView.classList.remove("hidden");
+
+      runningTotal = results.reduce((s, r) => s + (r.total || 0), 0);
+      progressEl.textContent = `Finished · ${runningTotal} / 30`;
+
+      document.getElementById("final-score").textContent = `You got ${runningTotal} out of 30`;
+      document.getElementById("celebrate-msg").textContent = celebrationMessage(runningTotal);
+      document.getElementById("overall-feedback").textContent = overallFeedback(runningTotal, results);
+
+      const summary = document.getElementById("summary-list");
+      summary.innerHTML = "";
+      QUESTIONS.forEach((q, i) => {
+        const r = results[i];
+        const div = document.createElement("div");
+        div.className = "summary-item";
+        const lines = r.markRows
+          .map((m) => `<li><strong>${escapeHtml(m.label)}:</strong> ${m.marks}/${m.max} — ${escapeHtml(m.note)}</li>`)
+          .join("");
+        div.innerHTML = `
+          <h3>Question ${i + 1}: ${r.total} / ${q.max}</h3>
+          <p style="font-size:0.88rem;margin-bottom:0.4rem;opacity:0.85">${escapeHtml(q.question)}</p>
+          <ul style="margin-left:1.1rem;font-size:0.88rem;line-height:1.45">${lines}</ul>
+        `;
+        summary.appendChild(div);
+      });
+
+      startFireworks(runningTotal);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function celebrationMessage(score) {
+      if (score >= 20) return "🌟 Huge celebration! Outstanding debate writing!";
+      if (score >= 10) return "✨ Nice work — enjoy a colorful firework show!";
+      return "🎆 A little sparkle for getting started — you can climb higher!";
+    }
+
+    function overallFeedback(score, allResults) {
+      const tips = [];
+      allResults.forEach((r, i) => {
+        r.markRows.forEach((m) => {
+          if (m.marks < m.max) {
+            tips.push(m.label.toLowerCase());
+          }
+        });
+      });
+      const unique = [...new Set(tips)].slice(0, 3);
+
+      if (score >= 26) {
+        return "Excellent work overall. Your answers show clear thinking and strong debate habits. Keep using stance, reasons with “because”, examples, and fair rebuttals — you’re writing like a confident speaker.";
+      }
+      if (score >= 20) {
+        return (
+          "Strong effort! You hit many of the key debate moves. To push even higher, polish: " +
+          (unique.length ? unique.join(", ") : "sharper examples and clearer links between points") +
+          ". Compare your writing with the model answers and borrow their clear structure."
+        );
+      }
+      if (score >= 10) {
+        return (
+          "A solid start. Focus next on: " +
+          (unique.length ? unique.join("; ") : "clearer stance, two explained reasons, and one real example") +
+          ". Read each model answer and try rewriting one paragraph using the same pattern."
+        );
+      }
+      return (
+        "Thanks for giving it a go! Debate writing gets easier with a simple recipe: (1) clear stance, (2) reasons with “because”, (3) a real example, (4) polite confidence. " +
+        (unique.length ? "Especially practise: " + unique.join(", ") + ". " : "") +
+        "Use the model answers as a guide, then try again."
+      );
+    }
+
+    tryAgainBtn.addEventListener("click", () => {
+      stopFireworks();
+      current = 0;
+      runningTotal = 0;
+      results.length = 0;
+      showQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // ——— Fireworks ———
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    let fwAnim = null;
+    let rockets = [];
+    let particles = [];
+    let stars = [];
+    let fwEndAt = 0;
+    let fwTier = "low";
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function stopFireworks() {
+      if (fwAnim) cancelAnimationFrame(fwAnim);
+      fwAnim = null;
+      rockets = [];
+      particles = [];
+      stars = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function startFireworks(score) {
+      stopFireworks();
+      resizeCanvas();
+      if (score >= 20) fwTier = "high";
+      else if (score >= 10) fwTier = "mid";
+      else fwTier = "low";
+
+      const duration = fwTier === "high" ? 7000 : fwTier === "mid" ? 4500 : 2800;
+      fwEndAt = performance.now() + duration;
+
+      // initial bursts
+      const initial =
+        fwTier === "high" ? 5 : fwTier === "mid" ? 3 : 1;
+      for (let i = 0; i < initial; i++) spawnRocket(true);
+
+      if (fwTier === "high") {
+        for (let i = 0; i < 25; i++) spawnStar();
+      }
+
+      fwAnim = requestAnimationFrame(fwLoop);
+    }
+
+    function spawnRocket(instant) {
+      const colors =
+        fwTier === "high"
+          ? ["#ff6b9d", "#fde68a", "#4ade80", "#60a5fa", "#c084fc", "#fb923c", "#fff"]
+          : fwTier === "mid"
+            ? ["#ff6b9d", "#fde68a", "#60a5fa", "#4ade80", "#c084fc"]
+            : ["#fde68a", "#fda4af", "#a5b4fc"];
+
+      rockets.push({
+        x: Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+        y: canvas.height + 10,
+        tx: Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+        ty: canvas.height * (fwTier === "low" ? 0.45 : 0.25 + Math.random() * 0.25),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: fwTier === "high" ? 9 + Math.random() * 4 : fwTier === "mid" ? 7 + Math.random() * 3 : 5 + Math.random() * 2,
+        trail: []
+      });
+    }
+
+    function explode(x, y, color) {
+      const count =
+        fwTier === "high" ? 55 + Math.floor(Math.random() * 30) :
+        fwTier === "mid" ? 32 + Math.floor(Math.random() * 16) :
+        16 + Math.floor(Math.random() * 8);
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.2;
+        const speed =
+          (fwTier === "high" ? 2.5 : fwTier === "mid" ? 1.8 : 1.2) +
+          Math.random() * (fwTier === "high" ? 4 : 2.5);
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1,
+          decay: fwTier === "high" ? 0.012 + Math.random() * 0.01 : 0.016 + Math.random() * 0.012,
+          color,
+          size: fwTier === "high" ? 2.5 + Math.random() * 2.5 : 2 + Math.random() * 1.5,
+          sparkle: fwTier !== "low" && Math.random() < 0.35
+        });
+      }
+      if (fwTier === "high" && Math.random() < 0.6) {
+        for (let i = 0; i < 8; i++) spawnStar(x, y);
+      }
+    }
+
+    function spawnStar(x, y) {
+      stars.push({
+        x: x ?? Math.random() * canvas.width,
+        y: y ?? Math.random() * canvas.height * 0.6,
+        r: 0,
+        maxR: fwTier === "high" ? 10 + Math.random() * 14 : 6 + Math.random() * 6,
+        life: 1,
+        rot: Math.random() * Math.PI,
+        color: ["#fff", "#fde68a", "#c4b5fd", "#86efac"][Math.floor(Math.random() * 4)]
+      });
+    }
+
+    function drawStar(x, y, r, rot, color, alpha) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+        const sx = Math.cos(a) * r;
+        const sy = Math.sin(a) * r;
+        if (i === 0) ctx.moveTo(sx, sy);
+        else ctx.lineTo(sx, sy);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    let spawnAcc = 0;
+
+    function fwLoop(now) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const stillGoing = now < fwEndAt;
+      const spawnRate =
+        fwTier === "high" ? 18 : fwTier === "mid" ? 28 : 55;
+      spawnAcc++;
+      if (stillGoing && spawnAcc % spawnRate === 0) {
+        const n = fwTier === "high" ? 2 : 1;
+        for (let i = 0; i < n; i++) spawnRocket();
+      }
+
+      // rockets
+      rockets.forEach((r) => {
+        const dx = r.tx - r.x;
+        const dy = r.ty - r.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        r.x += (dx / dist) * r.speed;
+        r.y += (dy / dist) * r.speed;
+        r.trail.push({ x: r.x, y: r.y });
+        if (r.trail.length > 8) r.trail.shift();
+        r.trail.forEach((p, i) => {
+          ctx.globalAlpha = i / r.trail.length;
+          ctx.fillStyle = r.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        if (dist < r.speed * 1.2) {
+          explode(r.x, r.y, r.color);
+          r.dead = true;
+        }
+      });
+      rockets = rockets.filter((r) => !r.dead);
+
+      // particles
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.04;
+        p.life -= p.decay;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        if (p.sparkle && p.life > 0.4) {
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+        }
+      });
+      particles = particles.filter((p) => p.life > 0);
+
+      stars.forEach((s) => {
+        s.r += (s.maxR - s.r) * 0.15;
+        s.life -= fwTier === "high" ? 0.015 : 0.025;
+        s.rot += 0.05;
+        drawStar(s.x, s.y, s.r, s.rot, s.color, Math.max(0, s.life));
+      });
+      stars = stars.filter((s) => s.life > 0);
+
+      ctx.globalAlpha = 1;
+
+      if (stillGoing || rockets.length || particles.length || stars.length) {
+        fwAnim = requestAnimationFrame(fwLoop);
+      } else {
+        fwAnim = null;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
